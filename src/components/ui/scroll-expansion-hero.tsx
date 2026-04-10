@@ -4,7 +4,6 @@ import {
   useEffect,
   useRef,
   useCallback,
-  useState,
   ReactNode,
 } from 'react';
 import Image from 'next/image';
@@ -18,6 +17,13 @@ interface ScrollExpandMediaProps {
   children?: ReactNode;
 }
 
+/**
+ * Scroll-driven expansion: the section is 200vh tall. The first 100vh
+ * is the sticky hero where the card expands as you scroll. Once you've
+ * scrolled past the expansion zone, the hero unsticks and the rest of
+ * the page scrolls normally. No scroll hijacking, no preventDefault,
+ * no overflow:hidden — just native scrolling driving the animation.
+ */
 const ScrollExpandMedia = ({
   mediaType = 'image',
   mediaSrc,
@@ -26,179 +32,73 @@ const ScrollExpandMedia = ({
   scrollToExpand,
   children,
 }: ScrollExpandMediaProps) => {
-  const progressRef = useRef(0);
-  const expandedRef = useRef(false);
-  const touchStartRef = useRef(0);
-  const isMobileRef = useRef(false);
-  const rafRef = useRef<number>(0);
-
+  const containerRef = useRef<HTMLDivElement>(null);
   const mediaRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
-
-  const [expanded, setExpanded] = useState(false);
+  const rafRef = useRef<number>(0);
 
   const applyProgress = useCallback((p: number) => {
-    const mobile = isMobileRef.current;
-    const startW = mobile ? 240 : 300;
-    const startH = mobile ? 320 : 400;
-    const maxW = mobile ? Math.min(window.innerWidth - 16, 800) : 1550;
-    const maxH = mobile ? Math.min(window.innerHeight - 40, 700) : 800;
+    const mobile = window.innerWidth < 768;
+    const startW = mobile ? 220 : 300;
+    const startH = mobile ? 300 : 400;
+    const maxW = mobile ? window.innerWidth - 16 : Math.min(window.innerWidth - 40, 1550);
+    const maxH = mobile ? window.innerHeight - 40 : Math.min(window.innerHeight - 40, 800);
 
     const w = startW + p * (maxW - startW);
     const h = startH + p * (maxH - startH);
+    // Rounded corners shrink as card expands
+    const radius = Math.max(0, 24 * (1 - p * 0.7));
 
     if (mediaRef.current) {
       mediaRef.current.style.width = `${w}px`;
       mediaRef.current.style.height = `${h}px`;
+      mediaRef.current.style.borderRadius = `${radius}px`;
     }
     if (bgRef.current) {
       bgRef.current.style.opacity = `${1 - p}`;
     }
     if (hintRef.current) {
-      hintRef.current.style.opacity = `${Math.max(0, 1 - p * 4)}`;
+      hintRef.current.style.opacity = `${Math.max(0, 1 - p * 3)}`;
     }
   }, []);
-
-  const markExpanded = useCallback((val: boolean) => {
-    expandedRef.current = val;
-    setExpanded(val);
-    // Lock/unlock body scroll
-    if (val) {
-      document.body.style.overflow = '';
-    } else {
-      document.body.style.overflow = 'hidden';
-    }
-  }, []);
-
-  const updateProgress = useCallback((newP: number) => {
-    const clamped = Math.min(Math.max(newP, 0), 1);
-    progressRef.current = clamped;
-
-    // Synchronously update expanded state
-    if (clamped >= 1 && !expandedRef.current) {
-      markExpanded(true);
-    } else if (clamped < 1 && expandedRef.current) {
-      markExpanded(false);
-    }
-
-    cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => {
-      applyProgress(clamped);
-    });
-  }, [applyProgress, markExpanded]);
-
-  const snapIfNeeded = useCallback(() => {
-    const p = progressRef.current;
-    if (p > 0.75 && p < 1) {
-      const animate = () => {
-        const current = progressRef.current;
-        if (current >= 1) return;
-        updateProgress(Math.min(current + 0.05, 1));
-        requestAnimationFrame(animate);
-      };
-      animate();
-    } else if (p < 0.25 && p > 0) {
-      const animate = () => {
-        const current = progressRef.current;
-        if (current <= 0) return;
-        updateProgress(Math.max(current - 0.05, 0));
-        requestAnimationFrame(animate);
-      };
-      animate();
-    }
-  }, [updateProgress]);
 
   useEffect(() => {
-    const checkMobile = () => {
-      isMobileRef.current = window.innerWidth < 768;
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Lock body scroll on mount, unlock on unmount
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
     applyProgress(0);
 
+    const onScroll = () => {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        if (!containerRef.current) return;
+
+        const rect = containerRef.current.getBoundingClientRect();
+        // The container is 200vh. The first 100vh is the sticky zone.
+        // scrolled = how far past the top of the container we've scrolled
+        const scrolled = -rect.top;
+        // expansionZone = the height of the scroll area that drives the animation
+        const expansionZone = window.innerHeight;
+        const progress = Math.min(Math.max(scrolled / expansionZone, 0), 1);
+
+        applyProgress(progress);
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
-      document.body.style.overflow = '';
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(rafRef.current);
     };
   }, [applyProgress]);
 
-  useEffect(() => {
-    const handleWheel = (e: globalThis.WheelEvent) => {
-      if (expandedRef.current) {
-        // Scroll up at top of page → collapse back
-        if (e.deltaY < 0 && window.scrollY <= 5) {
-          updateProgress(0.95);
-          e.preventDefault();
-        }
-        // Otherwise let page scroll normally
-        return;
-      }
-
-      e.preventDefault();
-      const delta = e.deltaY * 0.002;
-      updateProgress(progressRef.current + delta);
-    };
-
-    const handleTouchStart = (e: globalThis.TouchEvent) => {
-      touchStartRef.current = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e: globalThis.TouchEvent) => {
-      if (!touchStartRef.current) return;
-
-      const touchY = e.touches[0].clientY;
-      const deltaY = touchStartRef.current - touchY;
-
-      if (expandedRef.current) {
-        if (deltaY < -30 && window.scrollY <= 5) {
-          updateProgress(0.95);
-          touchStartRef.current = touchY;
-          e.preventDefault();
-        }
-        return;
-      }
-
-      e.preventDefault();
-      const sensitivity = 0.006;
-      updateProgress(progressRef.current + deltaY * sensitivity);
-      touchStartRef.current = touchY;
-    };
-
-    const handleTouchEnd = () => {
-      touchStartRef.current = 0;
-      if (!expandedRef.current) {
-        snapIfNeeded();
-      }
-    };
-
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd);
-
-    return () => {
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
-      cancelAnimationFrame(rafRef.current);
-    };
-  }, [updateProgress, snapIfNeeded]);
-
   return (
-    <div className='overflow-x-hidden'>
-      <section className='relative flex flex-col items-center justify-start min-h-[100dvh]'>
-        <div className='relative w-full flex flex-col items-center min-h-[100dvh]'>
-          {/* Background image */}
+    <div ref={containerRef} className='relative' style={{ height: '200vh' }}>
+      {/* Sticky hero fills the viewport and stays pinned while you scroll through the 200vh container */}
+      <div className='sticky top-0 h-[100dvh] overflow-hidden'>
+        <div className='relative w-full h-full flex flex-col items-center'>
+          {/* Background image — fades out */}
           <div
             ref={bgRef}
-            className='absolute inset-0 z-0 h-full'
+            className='absolute inset-0 z-0'
             style={{ willChange: 'opacity' }}
           >
             <Image
@@ -206,7 +106,7 @@ const ScrollExpandMedia = ({
               alt='Background'
               width={1920}
               height={1080}
-              className='w-screen h-screen'
+              className='w-full h-full'
               style={{ objectFit: 'cover', objectPosition: 'center' }}
               priority
             />
@@ -216,14 +116,15 @@ const ScrollExpandMedia = ({
           {/* Expanding media card */}
           <div
             ref={mediaRef}
-            className='absolute top-1/2 left-1/2 z-[1] rounded-3xl overflow-hidden'
+            className='absolute top-1/2 left-1/2 z-[1] overflow-hidden'
             style={{
-              width: '240px',
-              height: '320px',
+              width: '220px',
+              height: '300px',
+              borderRadius: '24px',
               maxWidth: 'calc(100vw - 16px)',
               maxHeight: '85vh',
               transform: 'translate(-50%, -50%)',
-              willChange: 'width, height',
+              willChange: 'width, height, border-radius',
               boxShadow: '0 8px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06)',
             }}
           >
@@ -255,28 +156,26 @@ const ScrollExpandMedia = ({
           </div>
 
           {/* Hero text */}
-          <div className='relative z-10 flex flex-col items-center justify-center w-full h-[100dvh] pointer-events-none'>
+          <div className='relative z-10 flex flex-col items-center justify-center w-full h-full pointer-events-none'>
             <div className='max-w-[800px] text-center px-5 sm:px-6 md:px-12 pointer-events-auto'>
               {children}
             </div>
 
             {/* Scroll hint */}
-            {!expanded && (
-              <div
-                ref={hintRef}
-                className='absolute bottom-8 sm:bottom-12 flex flex-col items-center gap-3'
-              >
-                {scrollToExpand && (
-                  <p className='text-accent text-xs uppercase tracking-[0.3em] font-medium'>
-                    {scrollToExpand}
-                  </p>
-                )}
-                <div className='w-px h-8 bg-accent/30 animate-pulse' />
-              </div>
-            )}
+            <div
+              ref={hintRef}
+              className='absolute bottom-8 sm:bottom-12 flex flex-col items-center gap-3'
+            >
+              {scrollToExpand && (
+                <p className='text-accent text-xs uppercase tracking-[0.3em] font-medium'>
+                  {scrollToExpand}
+                </p>
+              )}
+              <div className='w-px h-8 bg-accent/30 animate-pulse' />
+            </div>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
