@@ -19,6 +19,13 @@
   --font-sans: "DM Sans", system-ui, sans-serif;
 
   --animate-fade-up: fade-up 0.8s ease-out both;
+  --animate-shine: shine var(--duration, 14s) infinite linear;
+
+  @keyframes shine {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    to { background-position: 0% 0%; }
+  }
 
   @keyframes fade-up {
     from {
