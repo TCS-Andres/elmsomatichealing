@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import ScrollReveal from "./ScrollReveal";
 
 function handleClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
@@ -14,15 +15,17 @@ function handleClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
 export default function CTABanner() {
   return (
     <section className="py-16 sm:py-20 md:py-32 px-4 sm:px-6 md:px-12 text-center relative overflow-hidden">
-      {/* Accent glow */}
-      <div
-        className="absolute inset-0 pointer-events-none animate-pulse"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 60% at 50% 50%, rgba(201,168,124,0.10) 0%, transparent 70%)",
-          animationDuration: "4s",
-        }}
-      />
+      {/* Background image with warm tones */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1920&auto=format&fit=crop"
+          alt="Warm golden light"
+          width={1920}
+          height={1080}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-[#0D1A12]/75" />
+      </div>
 
       <ScrollReveal>
         <h2

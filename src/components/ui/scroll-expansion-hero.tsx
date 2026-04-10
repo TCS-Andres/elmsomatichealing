@@ -36,7 +36,7 @@ const ScrollExpandMedia = ({
   const bgRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
 
-  const [, setTick] = useState(0);
+  const [expanded, setExpanded] = useState(false);
 
   const applyProgress = useCallback((p: number) => {
     const mobile = isMobileRef.current;
@@ -60,41 +60,49 @@ const ScrollExpandMedia = ({
     }
   }, []);
 
+  const markExpanded = useCallback((val: boolean) => {
+    expandedRef.current = val;
+    setExpanded(val);
+    // Lock/unlock body scroll
+    if (val) {
+      document.body.style.overflow = '';
+    } else {
+      document.body.style.overflow = 'hidden';
+    }
+  }, []);
+
   const updateProgress = useCallback((newP: number) => {
     const clamped = Math.min(Math.max(newP, 0), 1);
     progressRef.current = clamped;
 
-    // CRITICAL: Update expanded state SYNCHRONOUSLY so the very next
-    // event handler sees the correct value — not inside rAF
+    // Synchronously update expanded state
     if (clamped >= 1 && !expandedRef.current) {
-      expandedRef.current = true;
-      setTick(t => t + 1); // trigger re-render to show content
+      markExpanded(true);
     } else if (clamped < 1 && expandedRef.current) {
-      expandedRef.current = false;
-      setTick(t => t + 1);
+      markExpanded(false);
     }
 
     cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
       applyProgress(clamped);
     });
-  }, [applyProgress]);
+  }, [applyProgress, markExpanded]);
 
   const snapIfNeeded = useCallback(() => {
     const p = progressRef.current;
-    if (p > 0.8 && p < 1) {
+    if (p > 0.75 && p < 1) {
       const animate = () => {
         const current = progressRef.current;
         if (current >= 1) return;
-        updateProgress(Math.min(current + 0.04, 1));
+        updateProgress(Math.min(current + 0.05, 1));
         requestAnimationFrame(animate);
       };
       animate();
-    } else if (p < 0.2 && p > 0) {
+    } else if (p < 0.25 && p > 0) {
       const animate = () => {
         const current = progressRef.current;
         if (current <= 0) return;
-        updateProgress(Math.max(current - 0.04, 0));
+        updateProgress(Math.max(current - 0.05, 0));
         requestAnimationFrame(animate);
       };
       animate();
@@ -110,28 +118,34 @@ const ScrollExpandMedia = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Lock body scroll on mount, unlock on unmount
   useEffect(() => {
+    document.body.style.overflow = 'hidden';
     applyProgress(0);
 
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [applyProgress]);
+
+  useEffect(() => {
     const handleWheel = (e: globalThis.WheelEvent) => {
-      // Once expanded, let the page scroll normally
       if (expandedRef.current) {
-        // Only intercept: scrolling up while at the very top → collapse
+        // Scroll up at top of page → collapse back
         if (e.deltaY < 0 && window.scrollY <= 5) {
           updateProgress(0.95);
           e.preventDefault();
         }
+        // Otherwise let page scroll normally
         return;
       }
 
-      // Not expanded yet — drive the animation
       e.preventDefault();
-      const delta = e.deltaY * 0.0015;
+      const delta = e.deltaY * 0.002;
       updateProgress(progressRef.current + delta);
     };
 
     const handleTouchStart = (e: globalThis.TouchEvent) => {
-      // ALWAYS record touch start position — even when expanded
       touchStartRef.current = e.touches[0].clientY;
     };
 
@@ -142,19 +156,16 @@ const ScrollExpandMedia = ({
       const deltaY = touchStartRef.current - touchY;
 
       if (expandedRef.current) {
-        // Expanded — swipe down at top of page collapses
         if (deltaY < -30 && window.scrollY <= 5) {
           updateProgress(0.95);
           touchStartRef.current = touchY;
           e.preventDefault();
         }
-        // Otherwise: do nothing, let browser scroll the page
         return;
       }
 
-      // Not expanded — drive the animation
       e.preventDefault();
-      const sensitivity = 0.005;
+      const sensitivity = 0.006;
       updateProgress(progressRef.current + deltaY * sensitivity);
       touchStartRef.current = touchY;
     };
@@ -166,38 +177,25 @@ const ScrollExpandMedia = ({
       }
     };
 
-    const handleScroll = () => {
-      // Only lock scroll position while animation is in progress
-      if (!expandedRef.current && progressRef.current > 0) {
-        window.scrollTo(0, 0);
-      }
-    };
-
     window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('scroll', handleScroll);
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd);
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
       cancelAnimationFrame(rafRef.current);
     };
-  }, [applyProgress, updateProgress, snapIfNeeded]);
-
-  const isExpanded = expandedRef.current;
+  }, [updateProgress, snapIfNeeded]);
 
   return (
     <div className='overflow-x-hidden'>
-      <section
-        className='relative flex flex-col items-center justify-start min-h-[100dvh]'
-      >
+      <section className='relative flex flex-col items-center justify-start min-h-[100dvh]'>
         <div className='relative w-full flex flex-col items-center min-h-[100dvh]'>
-          {/* Background image — fades out as card expands */}
+          {/* Background image */}
           <div
             ref={bgRef}
             className='absolute inset-0 z-0 h-full'
@@ -262,22 +260,20 @@ const ScrollExpandMedia = ({
               {children}
             </div>
 
-            {/* Scroll hint — hidden once expanded */}
-            <div
-              ref={hintRef}
-              className='absolute bottom-8 sm:bottom-12 flex flex-col items-center gap-3'
-              style={{
-                willChange: 'opacity',
-                display: isExpanded ? 'none' : 'flex',
-              }}
-            >
-              {scrollToExpand && (
-                <p className='text-accent text-xs uppercase tracking-[0.3em] font-medium'>
-                  {scrollToExpand}
-                </p>
-              )}
-              <div className='w-px h-8 bg-accent/30 animate-pulse' />
-            </div>
+            {/* Scroll hint */}
+            {!expanded && (
+              <div
+                ref={hintRef}
+                className='absolute bottom-8 sm:bottom-12 flex flex-col items-center gap-3'
+              >
+                {scrollToExpand && (
+                  <p className='text-accent text-xs uppercase tracking-[0.3em] font-medium'>
+                    {scrollToExpand}
+                  </p>
+                )}
+                <div className='w-px h-8 bg-accent/30 animate-pulse' />
+              </div>
+            )}
           </div>
         </div>
       </section>
