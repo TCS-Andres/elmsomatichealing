@@ -55,16 +55,16 @@ const ScrollExpandMedia = ({
       bgRef.current.style.opacity = `${1 - p}`;
     }
     if (overlayRef.current) {
-      overlayRef.current.style.opacity = `${0.7 - p * 0.4}`;
+      // Keep strong overlay so text stays readable; lighten slightly as it expands
+      overlayRef.current.style.opacity = `${0.65 - p * 0.15}`;
     }
     if (hintRef.current) {
       hintRef.current.style.opacity = `${1 - p * 3}`;
     }
     if (heroTextRef.current) {
-      // Text fades in during the last 40% of progress
-      const textProgress = Math.max(0, (p - 0.6) / 0.4);
-      heroTextRef.current.style.opacity = `${textProgress}`;
-      heroTextRef.current.style.transform = `translateY(${20 - textProgress * 20}px)`;
+      // Text always visible, stays at full opacity throughout
+      heroTextRef.current.style.opacity = '1';
+      heroTextRef.current.style.transform = 'translateY(0px)';
     }
   }, []);
 
@@ -186,7 +186,7 @@ const ScrollExpandMedia = ({
               style={{ objectFit: 'cover', objectPosition: 'center' }}
               priority
             />
-            <div className='absolute inset-0 bg-[#0D1A12]/40' />
+            <div className='absolute inset-0 bg-[#0D1A12]/50' />
           </div>
 
           <div className='container mx-auto flex flex-col items-center justify-start relative z-10'>
@@ -237,15 +237,15 @@ const ScrollExpandMedia = ({
                 {/* Dark overlay */}
                 <div
                   ref={overlayRef}
-                  className='absolute inset-0 bg-[#0D1A12]/60'
-                  style={{ opacity: 0.7, willChange: 'opacity' }}
+                  className='absolute inset-0 bg-[#0D1A12]/70'
+                  style={{ opacity: 0.65, willChange: 'opacity' }}
                 />
 
                 {/* Hero text overlaid on the media */}
                 <div
                   ref={heroTextRef}
                   className='absolute inset-0 z-20 flex items-center justify-center px-6 md:px-12'
-                  style={{ opacity: 0, willChange: 'opacity, transform' }}
+                  style={{ opacity: 1 }}
                 >
                   <div className='max-w-[720px] text-center'>
                     <p className='text-[0.7rem] uppercase tracking-[0.35em] text-accent mb-6'>
