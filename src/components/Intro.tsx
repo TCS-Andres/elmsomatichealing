@@ -40,14 +40,16 @@ export default function Intro() {
 
           {/* Right Column — Glass testimonial */}
           <div
-            className="relative p-10 md:p-12"
+            className="relative p-10 md:p-12 rounded-3xl"
             style={{
-              border: "1px solid rgba(255,255,255,0.08)",
-              background: "rgba(255,255,255,0.04)",
-              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(255,255,255,0.10)",
+              background: "rgba(255,255,255,0.06)",
+              backdropFilter: "blur(24px) saturate(1.6)",
+              WebkitBackdropFilter: "blur(24px) saturate(1.6)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)",
             }}
           >
-            <span className="absolute top-2 left-6 font-serif text-6xl text-accent opacity-20 select-none">
+            <span className="absolute top-4 left-8 font-serif text-6xl text-accent opacity-20 select-none">
               &ldquo;
             </span>
             <blockquote className="font-serif text-[1.4rem] italic leading-[1.6] mt-6">

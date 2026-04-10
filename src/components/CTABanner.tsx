@@ -19,7 +19,7 @@ export default function CTABanner() {
         className="absolute inset-0 pointer-events-none animate-pulse"
         style={{
           background:
-            "radial-gradient(ellipse 60% 60% at 50% 50%, rgba(196,168,130,0.15) 0%, transparent 70%)",
+            "radial-gradient(ellipse 60% 60% at 50% 50%, rgba(201,168,124,0.10) 0%, transparent 70%)",
           animationDuration: "4s",
         }}
       />
@@ -37,7 +37,7 @@ export default function CTABanner() {
         <a
           href="#sessions"
           onClick={(e) => handleClick(e, "#sessions")}
-          className="relative z-10 inline-block py-4 px-14 bg-accent text-bg text-[0.75rem] uppercase tracking-[0.2em] font-medium hover:bg-text transition-all duration-400"
+          className="relative z-10 inline-block py-4 px-14 bg-accent text-bg text-[0.75rem] uppercase tracking-[0.2em] font-medium rounded-full hover:bg-text transition-all duration-400"
         >
           Book Your Session
         </a>

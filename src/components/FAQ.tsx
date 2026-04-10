@@ -46,10 +46,27 @@ export default function FAQ() {
         </div>
       </ScrollReveal>
 
-      <div className="max-w-[800px] mx-auto">
+      <div
+        className="max-w-[800px] mx-auto rounded-3xl overflow-hidden"
+        style={{
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          backdropFilter: "blur(16px) saturate(1.4)",
+          WebkitBackdropFilter: "blur(16px) saturate(1.4)",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.04)",
+        }}
+      >
         {faqs.map((faq, i) => (
           <ScrollReveal key={i} delay={i * 0.05}>
-            <div style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+            <div
+              className="px-8 md:px-10"
+              style={{
+                borderBottom:
+                  i < faqs.length - 1
+                    ? "1px solid rgba(255,255,255,0.06)"
+                    : "none",
+              }}
+            >
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
                 className="w-full bg-transparent border-none py-7 flex justify-between items-center gap-8 cursor-pointer text-left"

@@ -59,7 +59,7 @@ export default function Hero() {
           <a
             href="#sessions"
             onClick={(e) => handleClick(e, "#sessions")}
-            className="inline-block py-4 px-12 border border-accent text-accent text-[0.75rem] uppercase tracking-[0.2em] hover:bg-accent hover:text-bg transition-all duration-400"
+            className="inline-block py-4 px-12 border border-accent text-accent text-[0.75rem] uppercase tracking-[0.2em] rounded-full hover:bg-accent hover:text-bg transition-all duration-400"
           >
             Explore Sessions
           </a>

@@ -39,18 +39,26 @@ export default function Navigation() {
 
   return (
     <nav
-      className="fixed top-0 left-0 w-full z-50 transition-all duration-400"
+      className="fixed top-0 left-0 w-full z-50 transition-all duration-500"
       style={{
-        padding: scrolled ? "0.8rem 3rem" : "1.25rem 3rem",
-        background: scrolled
-          ? "rgba(12,11,14,0.9)"
-          : "rgba(12,11,14,0.7)",
-        backdropFilter: "blur(40px)",
-        WebkitBackdropFilter: "blur(40px)",
-        borderBottom: "1px solid rgba(255,255,255,0.08)",
+        padding: scrolled ? "0.6rem 2rem" : "1rem 2rem",
       }}
     >
-      <div className="max-w-[1400px] mx-auto flex items-center justify-between">
+      <div
+        className="max-w-[1400px] mx-auto flex items-center justify-between px-6 transition-all duration-500 rounded-2xl"
+        style={{
+          padding: scrolled ? "0.6rem 1.5rem" : "0.8rem 1.5rem",
+          background: scrolled
+            ? "rgba(13,26,18,0.85)"
+            : "rgba(13,26,18,0.5)",
+          backdropFilter: "blur(40px) saturate(1.8)",
+          WebkitBackdropFilter: "blur(40px) saturate(1.8)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          boxShadow: scrolled
+            ? "0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)"
+            : "0 4px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
+        }}
+      >
         <a
           href="#"
           onClick={(e) => handleClick(e, "#")}
@@ -74,7 +82,7 @@ export default function Navigation() {
           <a
             href="#sessions"
             onClick={(e) => handleClick(e, "#sessions")}
-            className="px-7 py-2.5 border border-accent text-accent text-[0.75rem] uppercase tracking-[0.2em] hover:bg-accent hover:text-bg transition-all duration-300"
+            className="px-7 py-2.5 border border-accent text-accent text-[0.75rem] uppercase tracking-[0.2em] rounded-full hover:bg-accent hover:text-bg transition-all duration-300"
           >
             Book a Session
           </a>
@@ -95,11 +103,13 @@ export default function Navigation() {
       {/* Mobile menu */}
       {menuOpen && (
         <div
-          className="md:hidden flex flex-col gap-4 p-6 mt-2"
+          className="md:hidden flex flex-col gap-4 p-6 mt-2 mx-8 rounded-2xl"
           style={{
-            background: "rgba(12,11,14,0.95)",
-            backdropFilter: "blur(40px)",
-            borderTop: "1px solid rgba(255,255,255,0.08)",
+            background: "rgba(13,26,18,0.92)",
+            backdropFilter: "blur(40px) saturate(1.8)",
+            WebkitBackdropFilter: "blur(40px) saturate(1.8)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)",
           }}
         >
           {links.map((link) => (
@@ -115,7 +125,7 @@ export default function Navigation() {
           <a
             href="#sessions"
             onClick={(e) => handleClick(e, "#sessions")}
-            className="w-full text-center py-3 border border-accent text-accent text-[0.75rem] uppercase tracking-[0.2em] hover:bg-accent hover:text-bg transition-all duration-300"
+            className="w-full text-center py-3 border border-accent text-accent text-[0.75rem] uppercase tracking-[0.2em] rounded-full hover:bg-accent hover:text-bg transition-all duration-300"
           >
             Book a Session
           </a>

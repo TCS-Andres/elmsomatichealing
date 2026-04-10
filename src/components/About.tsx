@@ -35,16 +35,25 @@ export default function About() {
       <ScrollReveal>
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-12 md:gap-20">
           {/* Left — Credentials */}
-          <div className="md:sticky md:top-32 md:self-start">
+          <div
+            className="md:sticky md:top-32 md:self-start rounded-3xl p-8 md:p-10"
+            style={{
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              backdropFilter: "blur(20px) saturate(1.6)",
+              WebkitBackdropFilter: "blur(20px) saturate(1.6)",
+              boxShadow: "0 4px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
+            }}
+          >
             {credentials.map((cred, i) => (
               <div
                 key={cred.label}
-                className="py-7"
+                className="py-5"
                 style={{
-                  borderBottom: "1px solid rgba(255,255,255,0.08)",
-                  ...(i === 0
-                    ? { borderTop: "1px solid rgba(255,255,255,0.08)" }
-                    : {}),
+                  borderBottom:
+                    i < credentials.length - 1
+                      ? "1px solid rgba(255,255,255,0.06)"
+                      : "none",
                 }}
               >
                 <p className="text-[0.65rem] uppercase tracking-[0.2em] text-accent mb-1.5">

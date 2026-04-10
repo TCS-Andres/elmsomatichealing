@@ -50,16 +50,29 @@ export default function Stages() {
           </p>
         </div>
 
-        <div
-          className="max-w-[1200px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-px"
-          style={{
-            border: "1px solid rgba(255,255,255,0.08)",
-            background: "rgba(255,255,255,0.08)",
-          }}
-        >
+        <div className="max-w-[1200px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {stages.map((stage, i) => (
             <ScrollReveal key={stage.num} delay={i * 0.1}>
-              <div className="bg-bg p-8 text-center hover:bg-glass transition-colors duration-300 h-full">
+              <div
+                className="rounded-2xl p-8 text-center h-full transition-all duration-300 hover:scale-[1.02]"
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
+                  e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+                  e.currentTarget.style.boxShadow = "inset 0 1px 0 rgba(255,255,255,0.04)";
+                }}
+              >
                 <p className="font-serif text-[2.5rem] font-light text-accent opacity-40 mb-4">
                   {stage.num}
                 </p>

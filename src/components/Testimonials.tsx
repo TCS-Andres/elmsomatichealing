@@ -51,21 +51,26 @@ export default function Testimonials() {
         </div>
       </ScrollReveal>
 
-      <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {testimonials.map((t, i) => (
           <ScrollReveal key={t.author} delay={i * 0.08}>
             <div
-              className="flex flex-col p-10 h-full transition-all duration-300 hover:-translate-y-1"
+              className="flex flex-col p-10 h-full rounded-2xl transition-all duration-300 hover:-translate-y-1"
               style={{
-                border: "1px solid rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.10)",
                 background: "rgba(255,255,255,0.04)",
+                backdropFilter: "blur(16px) saturate(1.4)",
+                WebkitBackdropFilter: "blur(16px) saturate(1.4)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.boxShadow =
-                  "0 8px 32px rgba(196,168,130,0.08)";
+                  "0 12px 40px rgba(201,168,124,0.08), inset 0 1px 0 rgba(255,255,255,0.06)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = "none";
+                e.currentTarget.style.boxShadow = "inset 0 1px 0 rgba(255,255,255,0.05)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)";
               }}
             >
               <blockquote className="font-serif text-[1.05rem] italic leading-[1.7] flex-1 mb-6">
