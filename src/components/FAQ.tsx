@@ -31,7 +31,7 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="py-28 px-6 md:px-12">
+    <section id="faq" className="py-16 sm:py-20 md:py-28 px-4 sm:px-6 md:px-12">
       <ScrollReveal>
         <div className="max-w-[600px] mx-auto text-center mb-16">
           <p className="text-[0.65rem] uppercase tracking-[0.3em] text-accent mb-4">

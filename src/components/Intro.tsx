@@ -4,9 +4,9 @@ import ScrollReveal from "./ScrollReveal";
 
 export default function Intro() {
   return (
-    <section id="method" className="py-28 px-6 md:px-12">
+    <section id="method" className="py-16 sm:py-20 md:py-28 px-4 sm:px-6 md:px-12">
       <ScrollReveal>
-        <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24 items-center">
+        <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-24 items-center">
           {/* Left Column */}
           <div>
             <p className="text-[0.65rem] uppercase tracking-[0.3em] text-accent mb-6">
@@ -40,7 +40,7 @@ export default function Intro() {
 
           {/* Right Column — Glass testimonial */}
           <div
-            className="relative p-6 sm:p-8 md:p-12 rounded-3xl"
+            className="relative p-5 sm:p-8 md:p-12 rounded-3xl"
             style={{
               border: "1px solid rgba(255,255,255,0.10)",
               background: "rgba(255,255,255,0.06)",
@@ -52,7 +52,7 @@ export default function Intro() {
             <span className="absolute top-2 left-4 sm:top-4 sm:left-8 font-serif text-4xl sm:text-6xl text-accent opacity-20 select-none">
               &ldquo;
             </span>
-            <blockquote className="font-serif text-[1.4rem] italic leading-[1.6] mt-6">
+            <blockquote className="font-serif text-[1.1rem] sm:text-[1.25rem] md:text-[1.4rem] italic leading-[1.6] mt-6">
               After two years of infertility, I&apos;m so happy to send you this
               email. We&apos;re 12 weeks pregnant. I had my session with you in
               September and conceived our baby in November, naturally.

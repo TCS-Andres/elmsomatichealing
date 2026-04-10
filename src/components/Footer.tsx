@@ -27,18 +27,18 @@ const externalLinks = [
 ];
 
 const linkClass =
-  "text-[0.7rem] uppercase tracking-[0.1em] text-text-dim hover:text-text transition-colors duration-300";
+  "text-xs uppercase tracking-[0.1em] text-text-dim hover:text-text transition-colors duration-300 py-1";
 
 export default function Footer() {
   return (
     <footer
-      className="px-6 md:px-12 py-12"
+      className="px-4 sm:px-6 md:px-12 py-8 sm:py-12"
       style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
     >
       <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
         <p className="font-serif text-lg tracking-[0.2em] text-accent">ELM</p>
 
-        <div className="flex flex-wrap justify-center gap-5 sm:gap-8">
+        <div className="flex flex-wrap justify-center gap-3 sm:gap-5 md:gap-8">
           {internalLinks.map((link) => (
             <a
               key={link.href}
@@ -62,7 +62,7 @@ export default function Footer() {
           ))}
         </div>
 
-        <p className="text-[0.7rem] text-text-dim">
+        <p className="text-xs text-text-dim">
           &copy; 2026 ELM Health. All Rights Reserved.
         </p>
       </div>

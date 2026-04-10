@@ -32,7 +32,7 @@ const stages = [
 
 export default function Stages() {
   return (
-    <section id="five-stages" className="py-28 px-6 md:px-12">
+    <section id="five-stages" className="py-16 sm:py-20 md:py-28 px-4 sm:px-6 md:px-12">
       <ScrollReveal>
         <div className="max-w-[600px] mx-auto text-center mb-16">
           <p className="text-[0.65rem] uppercase tracking-[0.3em] text-accent mb-4">
@@ -54,7 +54,7 @@ export default function Stages() {
           {stages.map((stage, i) => (
             <ScrollReveal key={stage.num} delay={i * 0.1}>
               <div
-                className="rounded-2xl p-8 text-center h-full transition-all duration-300 hover:scale-[1.02]"
+                className="rounded-2xl p-5 sm:p-6 md:p-8 text-center h-full transition-all duration-300 hover:scale-[1.02]"
                 style={{
                   background: "rgba(255,255,255,0.04)",
                   border: "1px solid rgba(255,255,255,0.08)",
@@ -73,7 +73,7 @@ export default function Stages() {
                   e.currentTarget.style.boxShadow = "inset 0 1px 0 rgba(255,255,255,0.04)";
                 }}
               >
-                <p className="font-serif text-[2.5rem] font-light text-accent opacity-40 mb-4">
+                <p className="font-serif text-[1.8rem] sm:text-[2rem] md:text-[2.5rem] font-light text-accent opacity-40 mb-4">
                   {stage.num}
                 </p>
                 <p className="font-sans text-[0.75rem] uppercase tracking-[0.12em] font-medium mb-3">

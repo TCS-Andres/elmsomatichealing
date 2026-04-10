@@ -103,7 +103,7 @@ export default function Navigation() {
       {/* Mobile menu */}
       {menuOpen && (
         <div
-          className="md:hidden flex flex-col gap-4 p-6 mt-2 mx-8 rounded-2xl"
+          className="md:hidden flex flex-col gap-4 p-6 mt-2 mx-4 sm:mx-8 rounded-2xl"
           style={{
             background: "rgba(13,26,18,0.92)",
             backdropFilter: "blur(40px) saturate(1.8)",

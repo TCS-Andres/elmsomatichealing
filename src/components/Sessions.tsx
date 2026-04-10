@@ -67,7 +67,7 @@ const sessions = [
 
 export default function Sessions() {
   return (
-    <section id="sessions" className="py-28 px-6 md:px-12">
+    <section id="sessions" className="py-16 sm:py-20 md:py-28 px-4 sm:px-6 md:px-12">
       <ScrollReveal>
         <div className="max-w-[600px] mx-auto text-center mb-16">
           <p className="text-[0.65rem] uppercase tracking-[0.3em] text-accent mb-4">
@@ -90,7 +90,7 @@ export default function Sessions() {
         {sessions.map((session, i) => (
           <ScrollReveal key={session.title} delay={i * 0.1}>
             <div
-              className="group relative flex flex-col p-6 sm:p-8 md:p-12 h-full rounded-3xl transition-all duration-400 hover:-translate-y-1"
+              className="group relative flex flex-col p-5 sm:p-6 md:p-8 lg:p-12 h-full rounded-3xl transition-all duration-400 hover:-translate-y-1"
               style={{
                 border: session.featured
                   ? "1px solid rgba(201,168,124,0.25)"
@@ -107,10 +107,10 @@ export default function Sessions() {
               <p className="text-[0.65rem] uppercase tracking-[0.25em] text-accent mb-3">
                 {session.tag}
               </p>
-              <h3 className="font-serif text-[1.6rem] font-normal mb-2">
+              <h3 className="font-serif text-[1.3rem] sm:text-[1.4rem] md:text-[1.6rem] font-normal mb-2">
                 {session.title}
               </h3>
-              <p className="font-serif text-[2rem] font-light text-accent mb-6">
+              <p className="font-serif text-[1.5rem] sm:text-[1.75rem] md:text-[2rem] font-light text-accent mb-6">
                 {session.price}
               </p>
 
@@ -133,7 +133,7 @@ export default function Sessions() {
                 href={session.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`block text-center py-3.5 text-[0.72rem] uppercase tracking-[0.18em] rounded-full transition-all duration-300 ${
+                className={`block text-center py-3 sm:py-3.5 text-xs uppercase tracking-[0.18em] rounded-full transition-all duration-300 ${
                   session.featured
                     ? "bg-accent border border-accent text-bg hover:bg-transparent hover:text-accent"
                     : "border border-glass-border text-text hover:border-accent hover:text-accent"

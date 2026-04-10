@@ -13,7 +13,7 @@ function handleClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
 
 export default function CTABanner() {
   return (
-    <section className="py-20 md:py-32 px-6 md:px-12 text-center relative overflow-hidden">
+    <section className="py-16 sm:py-20 md:py-32 px-4 sm:px-6 md:px-12 text-center relative overflow-hidden">
       {/* Accent glow */}
       <div
         className="absolute inset-0 pointer-events-none animate-pulse"
@@ -37,7 +37,7 @@ export default function CTABanner() {
         <a
           href="#sessions"
           onClick={(e) => handleClick(e, "#sessions")}
-          className="relative z-10 inline-block py-4 px-8 md:px-14 bg-accent text-bg text-[0.75rem] uppercase tracking-[0.2em] font-medium rounded-full hover:bg-text transition-all duration-400"
+          className="relative z-10 inline-block py-3 px-6 sm:py-4 sm:px-8 md:px-14 bg-accent text-bg text-xs sm:text-[0.75rem] uppercase tracking-[0.2em] font-medium rounded-full hover:bg-text transition-all duration-400"
         >
           Book Your Session
         </a>

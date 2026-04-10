@@ -42,15 +42,15 @@ export default function Hero() {
       >
         <motion.p
           variants={item}
-          className="text-[0.7rem] uppercase tracking-[0.35em] text-accent mb-8"
+          className="text-xs sm:text-[0.75rem] uppercase tracking-[0.35em] text-accent mb-6 sm:mb-8"
         >
           Somatic Healing with Dr. Christian Gonzalez
         </motion.p>
 
         <motion.h1
           variants={item}
-          className="font-serif font-light leading-[1.15] mb-8"
-          style={{ fontSize: "clamp(2.8rem, 6vw, 4.5rem)" }}
+          className="font-serif font-light leading-[1.15] mb-6 sm:mb-8"
+          style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)" }}
         >
           Your body remembers
           <br />
@@ -59,7 +59,7 @@ export default function Hero() {
 
         <motion.p
           variants={item}
-          className="text-[1.05rem] text-text-muted max-w-[560px] mx-auto mb-12"
+          className="text-[0.9rem] sm:text-[1.05rem] text-text-muted max-w-[560px] mx-auto mb-8 sm:mb-12"
         >
           The Emotional Liberation Method is a body-based practice to access,
           express, and release the repressed emotions your nervous system has
@@ -70,7 +70,7 @@ export default function Hero() {
           <a
             href="#sessions"
             onClick={(e) => handleClick(e, "#sessions")}
-            className="inline-block py-4 px-8 md:px-12 border border-accent text-accent text-[0.75rem] uppercase tracking-[0.2em] rounded-full hover:bg-accent hover:text-bg transition-all duration-400"
+            className="inline-block py-3 px-6 sm:py-4 sm:px-8 md:px-12 border border-accent text-accent text-xs sm:text-[0.75rem] uppercase tracking-[0.2em] rounded-full hover:bg-accent hover:text-bg transition-all duration-400"
           >
             Explore Sessions
           </a>

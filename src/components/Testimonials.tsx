@@ -80,13 +80,13 @@ export default function Testimonials() {
     <section
       ref={sectionRef}
       id="testimonials"
-      className="py-28 px-6 md:px-12 overflow-hidden"
+      className="py-16 sm:py-20 md:py-28 px-4 sm:px-6 md:px-12 overflow-hidden"
     >
       <motion.div
         initial="hidden"
         animate={controls}
         variants={containerVariants}
-        className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20"
+        className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10 md:gap-16 lg:gap-20"
       >
         {/* Left: heading + navigation */}
         <motion.div
@@ -131,7 +131,7 @@ export default function Testimonials() {
         {/* Right: testimonial cards */}
         <motion.div
           variants={itemVariants}
-          className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px]"
+          className="relative min-h-[260px] sm:min-h-[300px] md:min-h-[360px]"
         >
           {testimonials.map((testimonial, index) => (
             <motion.div
@@ -150,7 +150,7 @@ export default function Testimonials() {
               }}
             >
               <div
-                className="rounded-3xl p-6 sm:p-8 md:p-10 h-full flex flex-col"
+                className="rounded-3xl p-5 sm:p-6 md:p-8 lg:p-10 h-full flex flex-col"
                 style={{
                   background: "rgba(255,255,255,0.05)",
                   border: "1px solid rgba(255,255,255,0.10)",
@@ -161,11 +161,11 @@ export default function Testimonials() {
                 }}
               >
                 {/* Quote mark */}
-                <span className="font-serif text-5xl text-accent opacity-25 leading-none mb-4 select-none">
+                <span className="font-serif text-4xl sm:text-5xl text-accent opacity-25 leading-none mb-3 sm:mb-4 select-none">
                   &ldquo;
                 </span>
 
-                <blockquote className="font-serif text-[1.2rem] md:text-[1.4rem] italic leading-[1.7] text-text flex-1 mb-8">
+                <blockquote className="font-serif text-[1rem] sm:text-[1.15rem] md:text-[1.3rem] italic leading-[1.7] text-text flex-1 mb-6 sm:mb-8">
                   {testimonial.quote}
                 </blockquote>
 

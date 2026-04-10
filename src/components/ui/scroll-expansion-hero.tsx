@@ -28,7 +28,6 @@ const ScrollExpandMedia = ({
 }: ScrollExpandMediaProps) => {
   const progressRef = useRef(0);
   const expandedRef = useRef(false);
-  const touchStartRef = useRef(0);
   const isMobileRef = useRef(false);
   const rafRef = useRef<number>(0);
 
@@ -37,6 +36,7 @@ const ScrollExpandMedia = ({
   const hintRef = useRef<HTMLDivElement>(null);
 
   const [showContent, setShowContent] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const applyProgress = useCallback((p: number) => {
     const mobile = isMobileRef.current;
@@ -75,14 +75,19 @@ const ScrollExpandMedia = ({
 
   useEffect(() => {
     const checkMobile = () => {
-      isMobileRef.current = window.innerWidth < 768;
+      const mobile = window.innerWidth < 768;
+      isMobileRef.current = mobile;
+      setIsMobile(mobile);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Desktop-only scroll hijacking
   useEffect(() => {
+    if (isMobile) return;
+
     applyProgress(0);
 
     const handleWheel = (e: globalThis.WheelEvent) => {
@@ -101,36 +106,6 @@ const ScrollExpandMedia = ({
       updateProgress(progressRef.current + delta);
     };
 
-    const handleTouchStart = (e: globalThis.TouchEvent) => {
-      touchStartRef.current = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e: globalThis.TouchEvent) => {
-      if (!touchStartRef.current) return;
-
-      const touchY = e.touches[0].clientY;
-      const deltaY = touchStartRef.current - touchY;
-
-      if (expandedRef.current) {
-        if (deltaY < -20 && window.scrollY <= 5) {
-          expandedRef.current = false;
-          setShowContent(false);
-          updateProgress(0.99);
-          e.preventDefault();
-        }
-        return;
-      }
-
-      e.preventDefault();
-      const factor = deltaY < 0 ? 0.008 : 0.005;
-      updateProgress(progressRef.current + deltaY * factor);
-      touchStartRef.current = touchY;
-    };
-
-    const handleTouchEnd = () => {
-      touchStartRef.current = 0;
-    };
-
     const handleScroll = () => {
       if (!expandedRef.current) {
         window.scrollTo(0, 0);
@@ -139,20 +114,42 @@ const ScrollExpandMedia = ({
 
     window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('scroll', handleScroll);
-    window.addEventListener('touchstart', handleTouchStart, { passive: false });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd);
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
       cancelAnimationFrame(rafRef.current);
     };
-  }, [applyProgress, updateProgress]);
+  }, [isMobile, applyProgress, updateProgress]);
 
+  // Mobile: static hero, no scroll hijacking
+  if (isMobile) {
+    return (
+      <div className='overflow-x-hidden'>
+        <section className='relative flex flex-col items-center justify-center min-h-[100dvh]'>
+          {/* Full-bleed background image */}
+          <div className='absolute inset-0 z-0'>
+            <Image
+              src={mediaSrc}
+              alt='Hero background'
+              width={1280}
+              height={720}
+              className='w-full h-full object-cover'
+              priority
+            />
+            <div className='absolute inset-0 bg-[#0D1A12]/50' />
+          </div>
+
+          {/* Hero text */}
+          <div className='relative z-10 text-center px-5 sm:px-8'>
+            {children}
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  // Desktop: scroll expansion animation
   return (
     <div className='overflow-x-hidden'>
       <section className='relative flex flex-col items-center justify-start min-h-[100dvh]'>
@@ -214,7 +211,7 @@ const ScrollExpandMedia = ({
               />
             )}
 
-            {/* Dark overlay on the image so it doesn't compete with text */}
+            {/* Dark overlay */}
             <div className='absolute inset-0 bg-[#0D1A12]/40' />
           </div>
 
@@ -231,7 +228,7 @@ const ScrollExpandMedia = ({
               style={{ willChange: 'opacity' }}
             >
               {scrollToExpand && (
-                <p className='text-accent text-[0.7rem] uppercase tracking-[0.3em] font-medium'>
+                <p className='text-accent text-xs uppercase tracking-[0.3em] font-medium'>
                   {scrollToExpand}
                 </p>
               )}

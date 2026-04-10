@@ -32,13 +32,13 @@ const credentials = [
 
 export default function About() {
   return (
-    <section id="about" className="py-28 px-6 md:px-12">
+    <section id="about" className="py-16 sm:py-20 md:py-28 px-4 sm:px-6 md:px-12">
       <div className="max-w-[1200px] mx-auto">
         {/* Top: Photo + Bio side by side */}
         <ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-[0.9fr_1.1fr] gap-8 md:gap-16 items-start mb-12 md:mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-[0.9fr_1.1fr] gap-6 sm:gap-8 md:gap-16 items-start mb-10 md:mb-16">
             {/* Photo */}
-            <div className="rounded-3xl overflow-hidden aspect-[3/4] relative">
+            <div className="rounded-3xl overflow-hidden aspect-square sm:aspect-[3/4] relative">
               <Image
                 src="/hero-bg.jpeg"
                 alt="Dr. Christian Gonzalez"
@@ -61,7 +61,7 @@ export default function About() {
               >
                 Dr. Christian Gonzalez
               </h2>
-              <div className="space-y-5 text-text-muted text-[0.95rem]">
+              <div className="space-y-4 sm:space-y-5 text-text-muted text-[0.9rem] sm:text-[0.95rem]">
                 <p>
                   For most of his career, Dr. Gonzalez searched for why people
                   suffer — from acute to the most chronic and deadly diseases.
@@ -99,7 +99,7 @@ export default function About() {
         {/* Bottom: Credentials grid — full width */}
         <ScrollReveal delay={0.15}>
           <div
-            className="rounded-3xl p-6 sm:p-8 md:p-10"
+            className="rounded-3xl p-4 sm:p-6 md:p-8 lg:p-10"
             style={{
               background: "rgba(255,255,255,0.04)",
               border: "1px solid rgba(255,255,255,0.08)",
