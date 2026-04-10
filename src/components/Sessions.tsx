@@ -1,6 +1,7 @@
 "use client";
 
 import ScrollReveal from "./ScrollReveal";
+import { GlowCard } from "./ui/spotlight-card";
 
 const sessions = [
   {
@@ -17,6 +18,7 @@ const sessions = [
     cta: "Book Group Session",
     link: "https://calendly.com/drchristiangonzalez/elm-group-immersion-virtual",
     featured: false,
+    glow: "sage" as const,
   },
   {
     tag: "1-on-1 · 90 Minutes",
@@ -32,6 +34,7 @@ const sessions = [
     cta: "Book Session",
     link: "https://calendly.com/drchristiangonzalez/reconnect",
     featured: false,
+    glow: "warm" as const,
   },
   {
     tag: "Recommended · Deep Transformation",
@@ -47,6 +50,7 @@ const sessions = [
     cta: "Book Deep Session",
     link: "https://calendly.com/drchristiangonzalez/reconnectrewire",
     featured: true,
+    glow: "gold" as const,
   },
   {
     tag: "Comprehensive · Mind + Body",
@@ -62,6 +66,7 @@ const sessions = [
     cta: "Book Full Reset",
     link: "https://calendly.com/drchristiangonzalez/reconnectrewirerestoration",
     featured: false,
+    glow: "cream" as const,
   },
 ];
 
@@ -89,54 +94,22 @@ export default function Sessions() {
       <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-5">
         {sessions.map((session, i) => (
           <ScrollReveal key={session.title} delay={i * 0.1}>
-            <div
-              className="group relative flex flex-col p-10 md:p-12 h-full rounded-3xl transition-all duration-400 hover:-translate-y-1"
-              style={{
-                border: session.featured
-                  ? "1px solid rgba(201,168,124,0.25)"
-                  : "1px solid rgba(255,255,255,0.10)",
-                background: session.featured
-                  ? "rgba(201,168,124,0.06)"
-                  : "rgba(255,255,255,0.04)",
-                backdropFilter: "blur(20px) saturate(1.6)",
-                WebkitBackdropFilter: "blur(20px) saturate(1.6)",
-                boxShadow: "0 4px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                e.currentTarget.style.borderColor = "rgba(201,168,124,0.2)";
-                e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = session.featured
-                  ? "rgba(201,168,124,0.06)"
-                  : "rgba(255,255,255,0.04)";
-                e.currentTarget.style.borderColor = session.featured
-                  ? "rgba(201,168,124,0.25)"
-                  : "rgba(255,255,255,0.10)";
-                e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05)";
-              }}
+            <GlowCard
+              glowColor={session.glow}
+              featured={session.featured}
+              className="flex flex-col p-10 md:p-12 h-full transition-transform duration-400 hover:-translate-y-1"
             >
-              {/* Top decorative line on hover */}
-              <div
-                className="absolute top-0 left-6 right-6 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-400 rounded-full"
-                style={{
-                  background:
-                    "linear-gradient(to right, transparent, #C9A87C, transparent)",
-                }}
-              />
-
-              <p className="text-[0.65rem] uppercase tracking-[0.25em] text-accent mb-3">
+              <p className="text-[0.65rem] uppercase tracking-[0.25em] text-accent mb-3 relative z-10">
                 {session.tag}
               </p>
-              <h3 className="font-serif text-[1.6rem] font-normal mb-2">
+              <h3 className="font-serif text-[1.6rem] font-normal mb-2 relative z-10">
                 {session.title}
               </h3>
-              <p className="font-serif text-[2rem] font-light text-accent mb-6">
+              <p className="font-serif text-[2rem] font-light text-accent mb-6 relative z-10">
                 {session.price}
               </p>
 
-              <ul className="flex-1 mb-8">
+              <ul className="flex-1 mb-8 relative z-10">
                 {session.features.map((feature) => (
                   <li
                     key={feature}
@@ -155,7 +128,7 @@ export default function Sessions() {
                 href={session.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`block text-center py-3.5 text-[0.72rem] uppercase tracking-[0.18em] rounded-full transition-all duration-300 ${
+                className={`block text-center py-3.5 text-[0.72rem] uppercase tracking-[0.18em] rounded-full transition-all duration-300 relative z-10 ${
                   session.featured
                     ? "bg-accent border border-accent text-bg hover:bg-transparent hover:text-accent"
                     : "border border-glass-border text-text hover:border-accent hover:text-accent"
@@ -163,7 +136,7 @@ export default function Sessions() {
               >
                 {session.cta}
               </a>
-            </div>
+            </GlowCard>
           </ScrollReveal>
         ))}
       </div>
