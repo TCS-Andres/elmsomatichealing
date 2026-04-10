@@ -42,7 +42,7 @@ export default function Stages() {
             className="font-serif font-light mb-4"
             style={{ fontSize: "clamp(2rem, 3.5vw, 2.6rem)" }}
           >
-            Five stages of return
+            Five Stages Of Return
           </h2>
           <p className="text-text-muted text-[0.95rem]">
             ELM combines somatic experiencing, breathwork, and vocalization to
@@ -76,7 +76,7 @@ export default function Stages() {
                 <p className="font-serif text-[1.8rem] sm:text-[2rem] md:text-[2.5rem] font-light text-accent opacity-40 mb-4">
                   {stage.num}
                 </p>
-                <p className="font-sans text-[0.75rem] uppercase tracking-[0.12em] font-medium mb-3">
+                <p className="font-serif text-[1.3rem] sm:text-[1.5rem] md:text-[1.8rem] font-light tracking-wide mb-3">
                   {stage.title}
                 </p>
                 <p className="text-[0.82rem] text-text-muted leading-[1.6]">

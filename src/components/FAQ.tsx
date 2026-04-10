@@ -41,7 +41,7 @@ export default function FAQ() {
             className="font-serif font-light"
             style={{ fontSize: "clamp(2rem, 3.5vw, 2.6rem)" }}
           >
-            Before you begin
+            Before You Begin
           </h2>
         </div>
       </ScrollReveal>

@@ -100,7 +100,7 @@ export default function Testimonials() {
             className="font-serif font-light leading-[1.25] mb-6"
             style={{ fontSize: "clamp(2rem, 3.5vw, 2.6rem)" }}
           >
-            In their words
+            In Their Words
           </h2>
           <p className="text-text-muted text-[0.95rem] mb-10 max-w-[440px]">
             Real experiences from people who came in feeling stuck — and left

@@ -16,7 +16,7 @@ export default function Intro() {
               className="font-serif font-light leading-[1.25] mb-8"
               style={{ fontSize: "clamp(2rem, 3.5vw, 2.8rem)" }}
             >
-              We cannot think our way out of what the body is holding.
+              We Cannot Think Our Way Out Of What The Body Is Holding.
             </h2>
             <div className="space-y-6 text-text-muted text-[0.95rem]">
               <p>

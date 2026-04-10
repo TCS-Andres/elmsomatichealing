@@ -77,7 +77,7 @@ export default function Sessions() {
             className="font-serif font-light mb-4"
             style={{ fontSize: "clamp(2rem, 3.5vw, 2.6rem)" }}
           >
-            Choose your path
+            Choose Your Path
           </h2>
           <p className="text-text-muted text-[0.95rem]">
             From a single guided session to a full mind-body medical reset. Each

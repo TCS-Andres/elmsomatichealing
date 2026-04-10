@@ -32,7 +32,7 @@ export default function CTABanner() {
           className="font-serif font-light mb-4 relative z-10"
           style={{ fontSize: "clamp(2.2rem, 4vw, 3.2rem)" }}
         >
-          You are whole. You have just forgotten.
+          You Are Whole. You Have Just Forgotten.
         </h2>
         <p className="text-text-muted text-[0.95rem] mb-10 relative z-10">
           Begin the return to yourself.

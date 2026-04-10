@@ -52,9 +52,9 @@ export default function Hero() {
           className="font-serif font-light leading-[1.15] mb-6 sm:mb-8"
           style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)" }}
         >
-          Your body remembers
+          Your Body Remembers
           <br />
-          what your mind has buried.
+          What Your Mind Has Buried.
         </motion.h1>
 
         <motion.p
