@@ -1,6 +1,7 @@
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import Intro from "@/components/Intro";
+import ELMPitch from "@/components/ELMPitch";
 import Stages from "@/components/Stages";
 import Sessions from "@/components/Sessions";
 import About from "@/components/About";
@@ -15,6 +16,7 @@ export default function Home() {
       <Navigation />
       <Hero />
       <Intro />
+      <ELMPitch />
       <Stages />
       <Sessions />
       <About />
