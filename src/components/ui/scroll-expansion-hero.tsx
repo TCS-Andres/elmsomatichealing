@@ -34,14 +34,10 @@ const ScrollExpandMedia = ({
 
   const mediaRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
-  const heroTextRef = useRef<HTMLDivElement>(null);
 
   const [showContent, setShowContent] = useState(false);
 
-  // Direct DOM updates — no React re-render needed
   const applyProgress = useCallback((p: number) => {
     const mobile = isMobileRef.current;
     const w = 300 + p * (mobile ? 650 : 1250);
@@ -54,17 +50,8 @@ const ScrollExpandMedia = ({
     if (bgRef.current) {
       bgRef.current.style.opacity = `${1 - p}`;
     }
-    if (overlayRef.current) {
-      // Keep strong overlay so text stays readable; lighten slightly as it expands
-      overlayRef.current.style.opacity = `${0.65 - p * 0.15}`;
-    }
     if (hintRef.current) {
       hintRef.current.style.opacity = `${1 - p * 3}`;
-    }
-    if (heroTextRef.current) {
-      // Text always visible, stays at full opacity throughout
-      heroTextRef.current.style.opacity = '1';
-      heroTextRef.current.style.transform = 'translateY(0px)';
     }
   }, []);
 
@@ -96,7 +83,6 @@ const ScrollExpandMedia = ({
   }, []);
 
   useEffect(() => {
-    // Apply initial state
     applyProgress(0);
 
     const handleWheel = (e: globalThis.WheelEvent) => {
@@ -171,7 +157,7 @@ const ScrollExpandMedia = ({
     <div className='overflow-x-hidden'>
       <section className='relative flex flex-col items-center justify-start min-h-[100dvh]'>
         <div className='relative w-full flex flex-col items-center min-h-[100dvh]'>
-          {/* Background image */}
+          {/* Background image — fades out as card expands */}
           <div
             ref={bgRef}
             className='absolute inset-0 z-0 h-full'
@@ -189,105 +175,67 @@ const ScrollExpandMedia = ({
             <div className='absolute inset-0 bg-[#0D1A12]/50' />
           </div>
 
-          <div className='container mx-auto flex flex-col items-center justify-start relative z-10'>
-            <div className='flex flex-col items-center justify-center w-full h-[100dvh] relative'>
-              {/* Expanding media card */}
-              <div
-                ref={mediaRef}
-                className='absolute z-10 top-1/2 left-1/2 rounded-3xl overflow-hidden'
-                style={{
-                  width: '300px',
-                  height: '400px',
-                  maxWidth: '95vw',
-                  maxHeight: '85vh',
-                  transform: 'translate(-50%, -50%)',
-                  willChange: 'width, height',
-                  boxShadow: '0 8px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06)',
-                }}
-              >
-                {mediaType === 'video' ? (
-                  <div className='relative w-full h-full'>
-                    <video
-                      src={mediaSrc}
-                      poster={posterSrc}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      preload='auto'
-                      className='w-full h-full object-cover'
-                      controls={false}
-                      disablePictureInPicture
-                      disableRemotePlayback
-                    />
-                  </div>
-                ) : (
-                  <div className='relative w-full h-full'>
-                    <Image
-                      src={mediaSrc}
-                      alt='Hero media'
-                      width={1280}
-                      height={720}
-                      className='w-full h-full object-cover'
-                      priority
-                    />
-                  </div>
-                )}
+          {/* Expanding media card — sits BEHIND the text (z-[1]) */}
+          <div
+            ref={mediaRef}
+            className='absolute top-1/2 left-1/2 z-[1] rounded-3xl overflow-hidden'
+            style={{
+              width: '300px',
+              height: '400px',
+              maxWidth: '95vw',
+              maxHeight: '85vh',
+              transform: 'translate(-50%, -50%)',
+              willChange: 'width, height',
+              boxShadow: '0 8px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06)',
+            }}
+          >
+            {mediaType === 'video' ? (
+              <video
+                src={mediaSrc}
+                poster={posterSrc}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload='auto'
+                className='w-full h-full object-cover'
+                controls={false}
+                disablePictureInPicture
+                disableRemotePlayback
+              />
+            ) : (
+              <Image
+                src={mediaSrc}
+                alt='Hero media'
+                width={1280}
+                height={720}
+                className='w-full h-full object-cover'
+                priority
+              />
+            )}
 
-                {/* Dark overlay */}
-                <div
-                  ref={overlayRef}
-                  className='absolute inset-0 bg-[#0D1A12]/70'
-                  style={{ opacity: 0.65, willChange: 'opacity' }}
-                />
+            {/* Dark overlay on the image so it doesn't compete with text */}
+            <div className='absolute inset-0 bg-[#0D1A12]/40' />
+          </div>
 
-                {/* Hero text overlaid on the media */}
-                <div
-                  ref={heroTextRef}
-                  className='absolute inset-0 z-20 flex items-center justify-center px-6 md:px-12'
-                  style={{ opacity: 1 }}
-                >
-                  <div className='max-w-[720px] text-center'>
-                    <p className='text-[0.7rem] uppercase tracking-[0.35em] text-accent mb-6'>
-                      Somatic Healing with Dr. Christian Gonzalez
-                    </p>
-                    <h1
-                      className='font-serif font-light leading-[1.15] mb-6 text-text'
-                      style={{ fontSize: 'clamp(2rem, 5vw, 4rem)' }}
-                    >
-                      Your body remembers what your mind has buried.{' '}
-                      <em className='text-accent'>This is where we begin.</em>
-                    </h1>
-                    <p className='text-[0.95rem] md:text-[1.05rem] text-text-muted max-w-[520px] mx-auto mb-10'>
-                      The Emotional Liberation Method is a body-based practice to access,
-                      express, and release the repressed emotions your nervous system has
-                      been holding — so you can finally heal.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Scroll hint */}
-              <div
-                ref={hintRef}
-                className='absolute bottom-12 z-20 flex flex-col items-center gap-3'
-                style={{ willChange: 'opacity' }}
-              >
-                {scrollToExpand && (
-                  <p className='text-accent text-[0.7rem] uppercase tracking-[0.3em] font-medium'>
-                    {scrollToExpand}
-                  </p>
-                )}
-                <div className='w-px h-8 bg-accent/30 animate-pulse' />
-              </div>
+          {/* Hero text — sits ABOVE the card (z-10), never moves */}
+          <div className='relative z-10 flex flex-col items-center justify-center w-full h-[100dvh] pointer-events-none'>
+            <div className='max-w-[800px] text-center px-6 md:px-12 pointer-events-auto'>
+              {children}
             </div>
 
-            {/* Content that appears after full expansion */}
+            {/* Scroll hint */}
             <div
-              className='flex flex-col w-full transition-opacity duration-700'
-              style={{ opacity: showContent ? 1 : 0, pointerEvents: showContent ? 'auto' : 'none' }}
+              ref={hintRef}
+              className='absolute bottom-12 flex flex-col items-center gap-3'
+              style={{ willChange: 'opacity' }}
             >
-              {children}
+              {scrollToExpand && (
+                <p className='text-accent text-[0.7rem] uppercase tracking-[0.3em] font-medium'>
+                  {scrollToExpand}
+                </p>
+              )}
+              <div className='w-px h-8 bg-accent/30 animate-pulse' />
             </div>
           </div>
         </div>
