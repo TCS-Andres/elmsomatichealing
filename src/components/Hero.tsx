@@ -30,8 +30,8 @@ export default function Hero() {
   return (
     <ScrollExpandMedia
       mediaType="image"
-      mediaSrc="https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?q=80&w=1280&auto=format&fit=crop"
-      bgImageSrc="https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=1920&auto=format&fit=crop"
+      mediaSrc="/hero-bg.jpeg"
+      bgImageSrc="/hero-bg.jpeg"
       scrollToExpand="Scroll to begin"
     >
       <motion.div
