@@ -38,7 +38,7 @@ export default function Footer() {
       <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
         <p className="font-serif text-lg tracking-[0.2em] text-accent">ELM</p>
 
-        <div className="flex flex-wrap justify-center gap-8">
+        <div className="flex flex-wrap justify-center gap-5 sm:gap-8">
           {internalLinks.map((link) => (
             <a
               key={link.href}

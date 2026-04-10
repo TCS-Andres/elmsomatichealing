@@ -59,7 +59,7 @@ export default function FAQ() {
         {faqs.map((faq, i) => (
           <ScrollReveal key={i} delay={i * 0.05}>
             <div
-              className="px-8 md:px-10"
+              className="px-5 sm:px-8 md:px-10"
               style={{
                 borderBottom:
                   i < faqs.length - 1
@@ -69,7 +69,7 @@ export default function FAQ() {
             >
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full bg-transparent border-none py-7 flex justify-between items-center gap-8 cursor-pointer text-left"
+                className="w-full bg-transparent border-none py-7 flex justify-between items-center gap-4 sm:gap-8 cursor-pointer text-left"
               >
                 <span className="font-sans text-base font-normal text-text">
                   {faq.q}

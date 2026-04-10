@@ -86,7 +86,7 @@ export default function Testimonials() {
         initial="hidden"
         animate={controls}
         variants={containerVariants}
-        className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-20"
+        className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20"
       >
         {/* Left: heading + navigation */}
         <motion.div
@@ -131,7 +131,7 @@ export default function Testimonials() {
         {/* Right: testimonial cards */}
         <motion.div
           variants={itemVariants}
-          className="relative min-h-[320px] md:min-h-[380px]"
+          className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px]"
         >
           {testimonials.map((testimonial, index) => (
             <motion.div
@@ -150,7 +150,7 @@ export default function Testimonials() {
               }}
             >
               <div
-                className="rounded-3xl p-8 md:p-10 h-full flex flex-col"
+                className="rounded-3xl p-6 sm:p-8 md:p-10 h-full flex flex-col"
                 style={{
                   background: "rgba(255,255,255,0.05)",
                   border: "1px solid rgba(255,255,255,0.10)",

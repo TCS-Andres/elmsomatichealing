@@ -6,7 +6,7 @@ export default function Intro() {
   return (
     <section id="method" className="py-28 px-6 md:px-12">
       <ScrollReveal>
-        <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 items-center">
+        <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24 items-center">
           {/* Left Column */}
           <div>
             <p className="text-[0.65rem] uppercase tracking-[0.3em] text-accent mb-6">
@@ -40,7 +40,7 @@ export default function Intro() {
 
           {/* Right Column — Glass testimonial */}
           <div
-            className="relative p-10 md:p-12 rounded-3xl"
+            className="relative p-6 sm:p-8 md:p-12 rounded-3xl"
             style={{
               border: "1px solid rgba(255,255,255,0.10)",
               background: "rgba(255,255,255,0.06)",
@@ -49,7 +49,7 @@ export default function Intro() {
               boxShadow: "0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)",
             }}
           >
-            <span className="absolute top-4 left-8 font-serif text-6xl text-accent opacity-20 select-none">
+            <span className="absolute top-2 left-4 sm:top-4 sm:left-8 font-serif text-4xl sm:text-6xl text-accent opacity-20 select-none">
               &ldquo;
             </span>
             <blockquote className="font-serif text-[1.4rem] italic leading-[1.6] mt-6">

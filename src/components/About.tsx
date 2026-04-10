@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import ScrollReveal from "./ScrollReveal";
 
 const credentials = [
@@ -33,39 +34,58 @@ export default function About() {
   return (
     <section id="about" className="py-28 px-6 md:px-12">
       <ScrollReveal>
-        <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-12 md:gap-20">
-          {/* Left — Credentials */}
-          <div
-            className="md:sticky md:top-32 md:self-start rounded-3xl p-8 md:p-10"
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              backdropFilter: "blur(20px) saturate(1.6)",
-              WebkitBackdropFilter: "blur(20px) saturate(1.6)",
-              boxShadow: "0 4px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
-            }}
-          >
-            {credentials.map((cred, i) => (
-              <div
-                key={cred.label}
-                className="py-5"
-                style={{
-                  borderBottom:
-                    i < credentials.length - 1
-                      ? "1px solid rgba(255,255,255,0.06)"
-                      : "none",
-                }}
-              >
-                <p className="text-[0.65rem] uppercase tracking-[0.2em] text-accent mb-1.5">
-                  {cred.label}
-                </p>
-                <p className="text-[0.9rem] text-text-muted">{cred.value}</p>
-              </div>
-            ))}
+        <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-8 md:gap-20">
+          {/* Left — Photo + Credentials */}
+          <div className="md:sticky md:top-32 md:self-start space-y-6">
+            {/* Dr. Gonzalez photo */}
+            <div className="rounded-3xl overflow-hidden aspect-[4/5] relative">
+              <Image
+                src="/hero-bg.jpeg"
+                alt="Dr. Christian Gonzalez"
+                width={600}
+                height={750}
+                className="w-full h-full object-cover object-top"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0D1A12]/60 via-transparent to-transparent" />
+            </div>
+
+            {/* Credentials card */}
+            <div
+              className="rounded-3xl p-6 sm:p-8 md:p-10"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                backdropFilter: "blur(20px) saturate(1.6)",
+                WebkitBackdropFilter: "blur(20px) saturate(1.6)",
+                boxShadow:
+                  "0 4px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
+              }}
+            >
+              {credentials.map((cred, i) => (
+                <div
+                  key={cred.label}
+                  className="py-5"
+                  style={{
+                    borderBottom:
+                      i < credentials.length - 1
+                        ? "1px solid rgba(255,255,255,0.06)"
+                        : "none",
+                  }}
+                >
+                  <p className="text-[0.65rem] uppercase tracking-[0.2em] text-accent mb-1.5">
+                    {cred.label}
+                  </p>
+                  <p className="text-[0.9rem] text-text-muted">{cred.value}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Right — Bio */}
           <div>
+            <p className="text-[0.65rem] uppercase tracking-[0.3em] text-accent mb-6">
+              About
+            </p>
             <h2
               className="font-serif font-light leading-[1.25] mb-8"
               style={{ fontSize: "clamp(2rem, 3.5vw, 2.6rem)" }}

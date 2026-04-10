@@ -90,7 +90,7 @@ export default function Sessions() {
         {sessions.map((session, i) => (
           <ScrollReveal key={session.title} delay={i * 0.1}>
             <div
-              className="group relative flex flex-col p-10 md:p-12 h-full rounded-3xl transition-all duration-400 hover:-translate-y-1"
+              className="group relative flex flex-col p-6 sm:p-8 md:p-12 h-full rounded-3xl transition-all duration-400 hover:-translate-y-1"
               style={{
                 border: session.featured
                   ? "1px solid rgba(201,168,124,0.25)"
