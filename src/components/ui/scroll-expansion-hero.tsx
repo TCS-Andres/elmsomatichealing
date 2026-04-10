@@ -3,182 +3,179 @@
 import {
   useEffect,
   useRef,
+  useCallback,
   useState,
   ReactNode,
-  TouchEvent,
-  WheelEvent,
 } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 
 interface ScrollExpandMediaProps {
   mediaType?: 'video' | 'image';
   mediaSrc: string;
   posterSrc?: string;
   bgImageSrc: string;
-  title?: string;
-  date?: string;
   scrollToExpand?: string;
-  textBlend?: boolean;
   children?: ReactNode;
 }
 
 const ScrollExpandMedia = ({
-  mediaType = 'video',
+  mediaType = 'image',
   mediaSrc,
   posterSrc,
   bgImageSrc,
-  title,
-  date,
   scrollToExpand,
-  textBlend,
   children,
 }: ScrollExpandMediaProps) => {
-  const [scrollProgress, setScrollProgress] = useState<number>(0);
-  const [showContent, setShowContent] = useState<boolean>(false);
-  const [mediaFullyExpanded, setMediaFullyExpanded] = useState<boolean>(false);
-  const [touchStartY, setTouchStartY] = useState<number>(0);
-  const [isMobileState, setIsMobileState] = useState<boolean>(false);
+  const progressRef = useRef(0);
+  const expandedRef = useRef(false);
+  const touchStartRef = useRef(0);
+  const isMobileRef = useRef(false);
+  const rafRef = useRef<number>(0);
 
-  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const mediaRef = useRef<HTMLDivElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const hintRef = useRef<HTMLDivElement>(null);
+  const heroTextRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setScrollProgress(0);
-    setShowContent(false);
-    setMediaFullyExpanded(false);
-  }, [mediaType]);
+  const [showContent, setShowContent] = useState(false);
 
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (mediaFullyExpanded && e.deltaY < 0 && window.scrollY <= 5) {
-        setMediaFullyExpanded(false);
-        e.preventDefault();
-      } else if (!mediaFullyExpanded) {
-        e.preventDefault();
-        const scrollDelta = e.deltaY * 0.0009;
-        const newProgress = Math.min(
-          Math.max(scrollProgress + scrollDelta, 0),
-          1
-        );
-        setScrollProgress(newProgress);
+  // Direct DOM updates — no React re-render needed
+  const applyProgress = useCallback((p: number) => {
+    const mobile = isMobileRef.current;
+    const w = 300 + p * (mobile ? 650 : 1250);
+    const h = 400 + p * (mobile ? 200 : 400);
 
-        if (newProgress >= 1) {
-          setMediaFullyExpanded(true);
-          setShowContent(true);
-        } else if (newProgress < 0.75) {
-          setShowContent(false);
-        }
+    if (mediaRef.current) {
+      mediaRef.current.style.width = `${w}px`;
+      mediaRef.current.style.height = `${h}px`;
+    }
+    if (bgRef.current) {
+      bgRef.current.style.opacity = `${1 - p}`;
+    }
+    if (overlayRef.current) {
+      overlayRef.current.style.opacity = `${0.7 - p * 0.4}`;
+    }
+    if (hintRef.current) {
+      hintRef.current.style.opacity = `${1 - p * 3}`;
+    }
+    if (heroTextRef.current) {
+      // Text fades in during the last 40% of progress
+      const textProgress = Math.max(0, (p - 0.6) / 0.4);
+      heroTextRef.current.style.opacity = `${textProgress}`;
+      heroTextRef.current.style.transform = `translateY(${20 - textProgress * 20}px)`;
+    }
+  }, []);
+
+  const updateProgress = useCallback((newP: number) => {
+    const clamped = Math.min(Math.max(newP, 0), 1);
+    progressRef.current = clamped;
+
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      applyProgress(clamped);
+
+      if (clamped >= 1 && !expandedRef.current) {
+        expandedRef.current = true;
+        setShowContent(true);
+      } else if (clamped < 1 && expandedRef.current) {
+        expandedRef.current = false;
+        setShowContent(false);
       }
+    });
+  }, [applyProgress]);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      isMobileRef.current = window.innerWidth < 768;
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    // Apply initial state
+    applyProgress(0);
+
+    const handleWheel = (e: globalThis.WheelEvent) => {
+      if (expandedRef.current) {
+        if (e.deltaY < 0 && window.scrollY <= 5) {
+          expandedRef.current = false;
+          setShowContent(false);
+          updateProgress(0.99);
+          e.preventDefault();
+        }
+        return;
+      }
+
+      e.preventDefault();
+      const delta = e.deltaY * 0.0012;
+      updateProgress(progressRef.current + delta);
     };
 
-    const handleTouchStart = (e: TouchEvent) => {
-      setTouchStartY(e.touches[0].clientY);
+    const handleTouchStart = (e: globalThis.TouchEvent) => {
+      touchStartRef.current = e.touches[0].clientY;
     };
 
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!touchStartY) return;
+    const handleTouchMove = (e: globalThis.TouchEvent) => {
+      if (!touchStartRef.current) return;
 
       const touchY = e.touches[0].clientY;
-      const deltaY = touchStartY - touchY;
+      const deltaY = touchStartRef.current - touchY;
 
-      if (mediaFullyExpanded && deltaY < -20 && window.scrollY <= 5) {
-        setMediaFullyExpanded(false);
-        e.preventDefault();
-      } else if (!mediaFullyExpanded) {
-        e.preventDefault();
-        const scrollFactor = deltaY < 0 ? 0.008 : 0.005;
-        const scrollDelta = deltaY * scrollFactor;
-        const newProgress = Math.min(
-          Math.max(scrollProgress + scrollDelta, 0),
-          1
-        );
-        setScrollProgress(newProgress);
-
-        if (newProgress >= 1) {
-          setMediaFullyExpanded(true);
-          setShowContent(true);
-        } else if (newProgress < 0.75) {
+      if (expandedRef.current) {
+        if (deltaY < -20 && window.scrollY <= 5) {
+          expandedRef.current = false;
           setShowContent(false);
+          updateProgress(0.99);
+          e.preventDefault();
         }
-
-        setTouchStartY(touchY);
+        return;
       }
+
+      e.preventDefault();
+      const factor = deltaY < 0 ? 0.008 : 0.005;
+      updateProgress(progressRef.current + deltaY * factor);
+      touchStartRef.current = touchY;
     };
 
-    const handleTouchEnd = (): void => {
-      setTouchStartY(0);
+    const handleTouchEnd = () => {
+      touchStartRef.current = 0;
     };
 
-    const handleScroll = (): void => {
-      if (!mediaFullyExpanded) {
+    const handleScroll = () => {
+      if (!expandedRef.current) {
         window.scrollTo(0, 0);
       }
     };
 
-    window.addEventListener('wheel', handleWheel as unknown as EventListener, {
-      passive: false,
-    });
-    window.addEventListener('scroll', handleScroll as EventListener);
-    window.addEventListener(
-      'touchstart',
-      handleTouchStart as unknown as EventListener,
-      { passive: false }
-    );
-    window.addEventListener(
-      'touchmove',
-      handleTouchMove as unknown as EventListener,
-      { passive: false }
-    );
-    window.addEventListener('touchend', handleTouchEnd as EventListener);
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
 
     return () => {
-      window.removeEventListener(
-        'wheel',
-        handleWheel as unknown as EventListener
-      );
-      window.removeEventListener('scroll', handleScroll as EventListener);
-      window.removeEventListener(
-        'touchstart',
-        handleTouchStart as unknown as EventListener
-      );
-      window.removeEventListener(
-        'touchmove',
-        handleTouchMove as unknown as EventListener
-      );
-      window.removeEventListener('touchend', handleTouchEnd as EventListener);
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+      cancelAnimationFrame(rafRef.current);
     };
-  }, [scrollProgress, mediaFullyExpanded, touchStartY]);
-
-  useEffect(() => {
-    const checkIfMobile = (): void => {
-      setIsMobileState(window.innerWidth < 768);
-    };
-
-    checkIfMobile();
-    window.addEventListener('resize', checkIfMobile);
-
-    return () => window.removeEventListener('resize', checkIfMobile);
-  }, []);
-
-  const mediaWidth = 300 + scrollProgress * (isMobileState ? 650 : 1250);
-  const mediaHeight = 400 + scrollProgress * (isMobileState ? 200 : 400);
-  const textTranslateX = scrollProgress * (isMobileState ? 180 : 150);
-
-  const firstWord = title ? title.split(' ')[0] : '';
-  const restOfTitle = title ? title.split(' ').slice(1).join(' ') : '';
+  }, [applyProgress, updateProgress]);
 
   return (
-    <div
-      ref={sectionRef}
-      className='transition-colors duration-700 ease-in-out overflow-x-hidden'
-    >
+    <div className='overflow-x-hidden'>
       <section className='relative flex flex-col items-center justify-start min-h-[100dvh]'>
         <div className='relative w-full flex flex-col items-center min-h-[100dvh]'>
-          <motion.div
+          {/* Background image */}
+          <div
+            ref={bgRef}
             className='absolute inset-0 z-0 h-full'
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 - scrollProgress }}
-            transition={{ duration: 0.1 }}
+            style={{ willChange: 'opacity' }}
           >
             <Image
               src={bgImageSrc}
@@ -186,154 +183,112 @@ const ScrollExpandMedia = ({
               width={1920}
               height={1080}
               className='w-screen h-screen'
-              style={{
-                objectFit: 'cover',
-                objectPosition: 'center',
-              }}
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
               priority
             />
-            <div className='absolute inset-0 bg-[#0D1A12]/30' />
-          </motion.div>
+            <div className='absolute inset-0 bg-[#0D1A12]/40' />
+          </div>
 
           <div className='container mx-auto flex flex-col items-center justify-start relative z-10'>
             <div className='flex flex-col items-center justify-center w-full h-[100dvh] relative'>
+              {/* Expanding media card */}
               <div
-                className='absolute z-0 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-none rounded-3xl'
+                ref={mediaRef}
+                className='absolute z-10 top-1/2 left-1/2 rounded-3xl overflow-hidden'
                 style={{
-                  width: `${mediaWidth}px`,
-                  height: `${mediaHeight}px`,
+                  width: '300px',
+                  height: '400px',
                   maxWidth: '95vw',
                   maxHeight: '85vh',
-                  boxShadow: '0px 0px 50px rgba(0, 0, 0, 0.3)',
+                  transform: 'translate(-50%, -50%)',
+                  willChange: 'width, height',
+                  boxShadow: '0 8px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06)',
                 }}
               >
                 {mediaType === 'video' ? (
-                  mediaSrc.includes('youtube.com') ? (
-                    <div className='relative w-full h-full pointer-events-none'>
-                      <iframe
-                        width='100%'
-                        height='100%'
-                        src={
-                          mediaSrc.includes('embed')
-                            ? mediaSrc +
-                              (mediaSrc.includes('?') ? '&' : '?') +
-                              'autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&disablekb=1&modestbranding=1'
-                            : mediaSrc.replace('watch?v=', 'embed/') +
-                              '?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&disablekb=1&modestbranding=1&playlist=' +
-                              mediaSrc.split('v=')[1]
-                        }
-                        className='w-full h-full rounded-3xl'
-                        frameBorder='0'
-                        allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                        allowFullScreen
-                      />
-                      <div
-                        className='absolute inset-0 z-10'
-                        style={{ pointerEvents: 'none' }}
-                      ></div>
-
-                      <motion.div
-                        className='absolute inset-0 bg-[#0D1A12]/40 rounded-3xl'
-                        initial={{ opacity: 0.7 }}
-                        animate={{ opacity: 0.5 - scrollProgress * 0.3 }}
-                        transition={{ duration: 0.2 }}
-                      />
-                    </div>
-                  ) : (
-                    <div className='relative w-full h-full pointer-events-none'>
-                      <video
-                        src={mediaSrc}
-                        poster={posterSrc}
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        preload='auto'
-                        className='w-full h-full object-cover rounded-3xl'
-                        controls={false}
-                        disablePictureInPicture
-                        disableRemotePlayback
-                      />
-                      <div
-                        className='absolute inset-0 z-10'
-                        style={{ pointerEvents: 'none' }}
-                      ></div>
-
-                      <motion.div
-                        className='absolute inset-0 bg-[#0D1A12]/40 rounded-3xl'
-                        initial={{ opacity: 0.7 }}
-                        animate={{ opacity: 0.5 - scrollProgress * 0.3 }}
-                        transition={{ duration: 0.2 }}
-                      />
-                    </div>
-                  )
+                  <div className='relative w-full h-full'>
+                    <video
+                      src={mediaSrc}
+                      poster={posterSrc}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      preload='auto'
+                      className='w-full h-full object-cover'
+                      controls={false}
+                      disablePictureInPicture
+                      disableRemotePlayback
+                    />
+                  </div>
                 ) : (
                   <div className='relative w-full h-full'>
                     <Image
                       src={mediaSrc}
-                      alt={title || 'Media content'}
+                      alt='Hero media'
                       width={1280}
                       height={720}
-                      className='w-full h-full object-cover rounded-3xl'
-                    />
-
-                    <motion.div
-                      className='absolute inset-0 bg-[#0D1A12]/50 rounded-3xl'
-                      initial={{ opacity: 0.7 }}
-                      animate={{ opacity: 0.7 - scrollProgress * 0.3 }}
-                      transition={{ duration: 0.2 }}
+                      className='w-full h-full object-cover'
+                      priority
                     />
                   </div>
                 )}
 
-                <div className='flex flex-col items-center text-center relative z-10 mt-4 transition-none'>
-                  {date && (
-                    <p
-                      className='text-2xl text-text'
-                      style={{ transform: `translateX(-${textTranslateX}vw)` }}
-                    >
-                      {date}
+                {/* Dark overlay */}
+                <div
+                  ref={overlayRef}
+                  className='absolute inset-0 bg-[#0D1A12]/60'
+                  style={{ opacity: 0.7, willChange: 'opacity' }}
+                />
+
+                {/* Hero text overlaid on the media */}
+                <div
+                  ref={heroTextRef}
+                  className='absolute inset-0 z-20 flex items-center justify-center px-6 md:px-12'
+                  style={{ opacity: 0, willChange: 'opacity, transform' }}
+                >
+                  <div className='max-w-[720px] text-center'>
+                    <p className='text-[0.7rem] uppercase tracking-[0.35em] text-accent mb-6'>
+                      Somatic Healing with Dr. Christian Gonzalez
                     </p>
-                  )}
-                  {scrollToExpand && (
-                    <p
-                      className='text-accent font-medium text-center'
-                      style={{ transform: `translateX(${textTranslateX}vw)` }}
+                    <h1
+                      className='font-serif font-light leading-[1.15] mb-6 text-text'
+                      style={{ fontSize: 'clamp(2rem, 5vw, 4rem)' }}
                     >
-                      {scrollToExpand}
+                      Your body remembers what your mind has buried.{' '}
+                      <em className='text-accent'>This is where we begin.</em>
+                    </h1>
+                    <p className='text-[0.95rem] md:text-[1.05rem] text-text-muted max-w-[520px] mx-auto mb-10'>
+                      The Emotional Liberation Method is a body-based practice to access,
+                      express, and release the repressed emotions your nervous system has
+                      been holding — so you can finally heal.
                     </p>
-                  )}
+                  </div>
                 </div>
               </div>
 
+              {/* Scroll hint */}
               <div
-                className={`flex items-center justify-center text-center gap-4 w-full relative z-10 transition-none flex-col ${
-                  textBlend ? 'mix-blend-difference' : 'mix-blend-normal'
-                }`}
+                ref={hintRef}
+                className='absolute bottom-12 z-20 flex flex-col items-center gap-3'
+                style={{ willChange: 'opacity' }}
               >
-                <motion.h2
-                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-text font-serif transition-none'
-                  style={{ transform: `translateX(-${textTranslateX}vw)` }}
-                >
-                  {firstWord}
-                </motion.h2>
-                <motion.h2
-                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-center text-blue-200 transition-none'
-                  style={{ transform: `translateX(${textTranslateX}vw)` }}
-                >
-                  {restOfTitle}
-                </motion.h2>
+                {scrollToExpand && (
+                  <p className='text-accent text-[0.7rem] uppercase tracking-[0.3em] font-medium'>
+                    {scrollToExpand}
+                  </p>
+                )}
+                <div className='w-px h-8 bg-accent/30 animate-pulse' />
               </div>
             </div>
 
-            <motion.section
-              className='flex flex-col w-full px-8 py-10 md:px-16 lg:py-20'
-              initial={{ opacity: 0 }}
-              animate={{ opacity: showContent ? 1 : 0 }}
-              transition={{ duration: 0.7 }}
+            {/* Content that appears after full expansion */}
+            <div
+              className='flex flex-col w-full transition-opacity duration-700'
+              style={{ opacity: showContent ? 1 : 0, pointerEvents: showContent ? 'auto' : 'none' }}
             >
               {children}
-            </motion.section>
+            </div>
           </div>
         </div>
       </section>
