@@ -1,7 +1,6 @@
 "use client";
 
 import ScrollReveal from "./ScrollReveal";
-import { ShineBorder } from "./ui/shine-border";
 
 const sessions = [
   {
@@ -18,7 +17,6 @@ const sessions = [
     cta: "Book Group Session",
     link: "https://calendly.com/drchristiangonzalez/elm-group-immersion-virtual",
     featured: false,
-    shine: ["#7A9A82", "#C9A87C"],
   },
   {
     tag: "1-on-1 · 90 Minutes",
@@ -34,7 +32,6 @@ const sessions = [
     cta: "Book Session",
     link: "https://calendly.com/drchristiangonzalez/reconnect",
     featured: false,
-    shine: ["#B8956A", "#7A9A82"],
   },
   {
     tag: "Recommended · Deep Transformation",
@@ -50,7 +47,6 @@ const sessions = [
     cta: "Book Deep Session",
     link: "https://calendly.com/drchristiangonzalez/reconnectrewire",
     featured: true,
-    shine: ["#C9A87C", "#F2EBE1", "#C9A87C"],
   },
   {
     tag: "Comprehensive · Mind + Body",
@@ -66,7 +62,6 @@ const sessions = [
     cta: "Book Full Reset",
     link: "https://calendly.com/drchristiangonzalez/reconnectrewirerestoration",
     featured: false,
-    shine: ["#C9A87C", "#7A9A82", "#B8956A"],
   },
 ];
 
@@ -94,16 +89,12 @@ export default function Sessions() {
       <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-5">
         {sessions.map((session, i) => (
           <ScrollReveal key={session.title} delay={i * 0.1}>
-            <ShineBorder
-              color={session.shine}
-              borderRadius={24}
-              borderWidth={session.featured ? 2 : 1}
-              duration={session.featured ? 10 : 14}
-              className="h-full overflow-hidden transition-transform duration-400 hover:-translate-y-1"
-            >
             <div
-              className="group relative flex flex-col p-6 sm:p-8 md:p-12 h-full rounded-3xl"
+              className="group relative flex flex-col p-6 sm:p-8 md:p-12 h-full rounded-3xl transition-all duration-400 hover:-translate-y-1"
               style={{
+                border: session.featured
+                  ? "1px solid rgba(201,168,124,0.25)"
+                  : "1px solid rgba(255,255,255,0.10)",
                 background: session.featured
                   ? "rgba(201,168,124,0.06)"
                   : "rgba(255,255,255,0.04)",
@@ -151,7 +142,6 @@ export default function Sessions() {
                 {session.cta}
               </a>
             </div>
-            </ShineBorder>
           </ScrollReveal>
         ))}
       </div>

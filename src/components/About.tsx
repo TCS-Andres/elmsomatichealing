@@ -42,8 +42,9 @@ export default function About() {
               <Image
                 src="/hero-bg.jpeg"
                 alt="Dr. Christian Gonzalez"
-                width={600}
-                height={750}
+                width={1200}
+                height={1500}
+                quality={90}
                 className="w-full h-full object-cover object-top"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0D1A12]/60 via-transparent to-transparent" />
