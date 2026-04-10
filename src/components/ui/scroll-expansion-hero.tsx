@@ -31,17 +31,15 @@ const ScrollExpandMedia = ({
   const touchStartRef = useRef(0);
   const isMobileRef = useRef(false);
   const rafRef = useRef<number>(0);
-  const sectionRef = useRef<HTMLElement>(null);
 
   const mediaRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
 
-  const [showContent, setShowContent] = useState(false);
+  const [, setTick] = useState(0);
 
   const applyProgress = useCallback((p: number) => {
     const mobile = isMobileRef.current;
-    // On mobile, start smaller and expand to viewport
     const startW = mobile ? 240 : 300;
     const startH = mobile ? 320 : 400;
     const maxW = mobile ? Math.min(window.innerWidth - 16, 800) : 1550;
@@ -66,38 +64,37 @@ const ScrollExpandMedia = ({
     const clamped = Math.min(Math.max(newP, 0), 1);
     progressRef.current = clamped;
 
+    // CRITICAL: Update expanded state SYNCHRONOUSLY so the very next
+    // event handler sees the correct value — not inside rAF
+    if (clamped >= 1 && !expandedRef.current) {
+      expandedRef.current = true;
+      setTick(t => t + 1); // trigger re-render to show content
+    } else if (clamped < 1 && expandedRef.current) {
+      expandedRef.current = false;
+      setTick(t => t + 1);
+    }
+
     cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
       applyProgress(clamped);
-
-      if (clamped >= 1 && !expandedRef.current) {
-        expandedRef.current = true;
-        setShowContent(true);
-      } else if (clamped < 1 && expandedRef.current) {
-        expandedRef.current = false;
-        setShowContent(false);
-      }
     });
   }, [applyProgress]);
 
-  // Snap: if user gets close to complete (>85%), auto-complete the animation
   const snapIfNeeded = useCallback(() => {
     const p = progressRef.current;
-    if (p > 0.85 && p < 1) {
-      // Animate to 1
+    if (p > 0.8 && p < 1) {
       const animate = () => {
         const current = progressRef.current;
         if (current >= 1) return;
-        updateProgress(current + 0.03);
+        updateProgress(Math.min(current + 0.04, 1));
         requestAnimationFrame(animate);
       };
       animate();
-    } else if (p < 0.15 && p > 0) {
-      // Snap back to 0
+    } else if (p < 0.2 && p > 0) {
       const animate = () => {
         const current = progressRef.current;
         if (current <= 0) return;
-        updateProgress(current - 0.03);
+        updateProgress(Math.max(current - 0.04, 0));
         requestAnimationFrame(animate);
       };
       animate();
@@ -117,23 +114,24 @@ const ScrollExpandMedia = ({
     applyProgress(0);
 
     const handleWheel = (e: globalThis.WheelEvent) => {
+      // Once expanded, let the page scroll normally
       if (expandedRef.current) {
+        // Only intercept: scrolling up while at the very top → collapse
         if (e.deltaY < 0 && window.scrollY <= 5) {
-          expandedRef.current = false;
-          setShowContent(false);
-          updateProgress(0.99);
+          updateProgress(0.95);
           e.preventDefault();
         }
         return;
       }
 
+      // Not expanded yet — drive the animation
       e.preventDefault();
-      const delta = e.deltaY * 0.0012;
+      const delta = e.deltaY * 0.0015;
       updateProgress(progressRef.current + delta);
     };
 
     const handleTouchStart = (e: globalThis.TouchEvent) => {
-      if (expandedRef.current) return; // Don't interfere with normal scrolling
+      // ALWAYS record touch start position — even when expanded
       touchStartRef.current = e.touches[0].clientY;
     };
 
@@ -144,36 +142,33 @@ const ScrollExpandMedia = ({
       const deltaY = touchStartRef.current - touchY;
 
       if (expandedRef.current) {
-        // Already expanded — let user scroll back up to collapse
+        // Expanded — swipe down at top of page collapses
         if (deltaY < -30 && window.scrollY <= 5) {
-          expandedRef.current = false;
-          setShowContent(false);
           updateProgress(0.95);
           touchStartRef.current = touchY;
           e.preventDefault();
         }
-        // Otherwise let the page scroll normally
+        // Otherwise: do nothing, let browser scroll the page
         return;
       }
 
-      // Not expanded — control the animation
+      // Not expanded — drive the animation
       e.preventDefault();
-      // Higher sensitivity on mobile for snappier feel
-      const sensitivity = 0.004;
+      const sensitivity = 0.005;
       updateProgress(progressRef.current + deltaY * sensitivity);
       touchStartRef.current = touchY;
     };
 
     const handleTouchEnd = () => {
       touchStartRef.current = 0;
-      // Snap to complete or snap back when finger lifts
       if (!expandedRef.current) {
         snapIfNeeded();
       }
     };
 
     const handleScroll = () => {
-      if (!expandedRef.current) {
+      // Only lock scroll position while animation is in progress
+      if (!expandedRef.current && progressRef.current > 0) {
         window.scrollTo(0, 0);
       }
     };
@@ -194,10 +189,11 @@ const ScrollExpandMedia = ({
     };
   }, [applyProgress, updateProgress, snapIfNeeded]);
 
+  const isExpanded = expandedRef.current;
+
   return (
     <div className='overflow-x-hidden'>
       <section
-        ref={sectionRef}
         className='relative flex flex-col items-center justify-start min-h-[100dvh]'
       >
         <div className='relative w-full flex flex-col items-center min-h-[100dvh]'>
@@ -219,7 +215,7 @@ const ScrollExpandMedia = ({
             <div className='absolute inset-0 bg-[#0D1A12]/50' />
           </div>
 
-          {/* Expanding media card — sits BEHIND the text (z-[1]) */}
+          {/* Expanding media card */}
           <div
             ref={mediaRef}
             className='absolute top-1/2 left-1/2 z-[1] rounded-3xl overflow-hidden'
@@ -257,22 +253,23 @@ const ScrollExpandMedia = ({
                 priority
               />
             )}
-
-            {/* Dark overlay */}
             <div className='absolute inset-0 bg-[#0D1A12]/40' />
           </div>
 
-          {/* Hero text — sits ABOVE the card (z-10), never moves */}
+          {/* Hero text */}
           <div className='relative z-10 flex flex-col items-center justify-center w-full h-[100dvh] pointer-events-none'>
             <div className='max-w-[800px] text-center px-5 sm:px-6 md:px-12 pointer-events-auto'>
               {children}
             </div>
 
-            {/* Scroll hint */}
+            {/* Scroll hint — hidden once expanded */}
             <div
               ref={hintRef}
               className='absolute bottom-8 sm:bottom-12 flex flex-col items-center gap-3'
-              style={{ willChange: 'opacity' }}
+              style={{
+                willChange: 'opacity',
+                display: isExpanded ? 'none' : 'flex',
+              }}
             >
               {scrollToExpand && (
                 <p className='text-accent text-xs uppercase tracking-[0.3em] font-medium'>
