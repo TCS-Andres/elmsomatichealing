@@ -55,8 +55,6 @@ export default function Hero() {
           Your body remembers
           <br />
           what your mind has buried.
-          <br />
-          <em className="text-accent">This is where we begin.</em>
         </motion.h1>
 
         <motion.p
