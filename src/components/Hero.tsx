@@ -38,6 +38,7 @@ export default function Hero() {
         variants={container}
         initial="hidden"
         animate="show"
+        className="max-w-[960px]"
       >
         <motion.p
           variants={item}
@@ -51,9 +52,7 @@ export default function Hero() {
           className="font-serif font-light leading-[1.15] mb-8"
           style={{ fontSize: "clamp(2.8rem, 6vw, 4.5rem)" }}
         >
-          Your body remembers
-          <br />
-          what your mind has buried.
+          Your body remembers what your mind has buried.
           <br />
           <em className="text-accent">This is where we begin.</em>
         </motion.h1>
